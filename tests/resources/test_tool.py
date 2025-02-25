@@ -128,3 +128,51 @@ class TestTool:
         """Test string representation of the tool."""
         expected_repr = 'Tool(tool_id="test-tool", title="Test Tool")'
         assert repr(tool) == expected_repr
+        
+    @patch('uuid.uuid4')
+    def test_tool_update(self, mock_uuid, tool):
+        """Test updating tool configuration."""
+        # Mock UUIDs for deterministic testing
+        mock_id = MagicMock()
+        mock_id.__str__.return_value = "test-id"
+        mock_version_id = MagicMock()
+        mock_version_id.__str__.return_value = "test-version-id"
+        mock_uuid.side_effect = [mock_id, mock_version_id]
+        
+        mock_response = MagicMock()
+        mock_response.json.return_value = {"status": "success"}
+        tool._post = MagicMock(return_value=mock_response)
+        
+        # Sample tool configuration
+        test_config = {
+            "title": "Updated Tool Title",
+            "description": "Updated description",
+            "transformations": {
+                "steps": [
+                    {
+                        "name": "test_step",
+                        "type": "llm",
+                        "config": {
+                            "prompt": "Test prompt"
+                        }
+                    }
+                ]
+            }
+        }
+        
+        result = tool.tool_update(config=test_config)
+        
+        # Verify the API call was made with correct parameters
+        tool._post.assert_called_once_with(
+            "tools/versions/upsert",
+            body={
+                "_id": "test-id",
+                "version_id": "test-version-id",
+                "project": tool._client.project,
+                "tool_id": "test-tool",
+                "config": test_config,
+                "partial_update": True,
+            }
+        )
+        
+        assert result == {"status": "success"}

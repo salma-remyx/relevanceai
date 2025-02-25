@@ -80,7 +80,10 @@ class TestToolsManager:
     @patch('uuid.uuid4')
     def test_create_tool(self, mock_uuid, tools_manager):
         """Test creating a new tool."""
-        mock_uuid.return_value = "new-tool-id"
+        # Mock uuid.uuid4 to return a UUID object with a fixed string representation
+        mock_uuid_obj = MagicMock()
+        mock_uuid_obj.__str__.return_value = "new-tool-id"
+        mock_uuid.return_value = mock_uuid_obj
         
         # Mock the bulk_update response
         mock_update_response = MagicMock()
