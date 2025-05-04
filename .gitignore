@@ -8,6 +8,7 @@ deploy.sh
 
 # my tests
 dev/
+zz_**
 
 # C extensions
 *.so

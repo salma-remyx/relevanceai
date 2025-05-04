@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "relevanceai"
+version = "10.2.1"
+description = "Use Relevance to build AI agents for your AI workforce"
+authors = ["Jacky Koh <jacky@relevanceai.com>"]
+license = "Apache License Version 2.0"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.13"
+pydantic = "2.8.2"
+requests = "2.32.3"
+httpx = "0.27.2"
+
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.11.8"
+
+
+[tool.poetry.group.test.dependencies]
+pytest = "8.3.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
