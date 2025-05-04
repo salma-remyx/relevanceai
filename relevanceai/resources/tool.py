@@ -6,6 +6,7 @@ from .._resource import SyncAPIResource, AsyncAPIResource
 from ..types.params import ParamsBase
 from ..types.transformations import TransformationBase
 
+
 class Tool(SyncAPIResource):
     _client: RelevanceAI
 
@@ -35,12 +36,12 @@ class Tool(SyncAPIResource):
         response = self._get(f"studios/{self.tool_id}/get", cast_to=dict)
         steps_schema = response["studio"]["transformations"]["steps"]
         return steps_schema
-    
+
     def update_metadata(
         self,
         title: str | None = None,
-        description: str | None = None, 
-        public: bool | None = None, 
+        description: str | None = None,
+        public: bool | None = None,
     ):
         response = self._get(f"studios/{self.tool_id}/get", cast_to=dict)
 
@@ -52,25 +53,13 @@ class Tool(SyncAPIResource):
         }
 
         path = "studios/bulk_update"
-        body = {
-            "updates": [updates],
-            "partial_update": True
-        }
+        body = {"updates": [updates], "partial_update": True}
         return self._post(path, body=body, cast_to=dict)
 
     def update_params(self, params: Dict[str, ParamsBase]) -> Tool:
-        
-        params_schema = {
-            "properties": {},
-            "required": [],
-            "type": "object"
-        }
-        
-        param_values = {
-            field_name: param.value
-            for field_name, param in params.items()
-            if param.value is not None
-        }
+        params_schema = {"properties": {}, "required": [], "type": "object"}
+
+        param_values = {field_name: param.value for field_name, param in params.items() if param.value is not None}
 
         for field_name, param in params.items():
             param_dict = param.model_dump(exclude_none=True)
@@ -78,68 +67,50 @@ class Tool(SyncAPIResource):
             if param.required:
                 params_schema["required"].append(field_name)
 
-        state_mapping = {
-            field_name: f"params.{field_name}" 
-            for field_name in params.keys()
-        }
+        state_mapping = {field_name: f"params.{field_name}" for field_name in params.keys()}
 
         path = "studios/bulk_update"
         body = {
-            "updates": [{
-                "studio_id": self.tool_id,
-                "params": param_values,
-                "params_schema": params_schema,
-                "state_mapping": state_mapping
-            }],
-            "partial_update": True
+            "updates": [
+                {
+                    "studio_id": self.tool_id,
+                    "params": param_values,
+                    "params_schema": params_schema,
+                    "state_mapping": state_mapping,
+                }
+            ],
+            "partial_update": True,
         }
-        
+
         return self._post(path, body=body, cast_to=dict)
-        
-    def update_transformations(
-        self,
-        transformations: List[TransformationBase],
-    ) -> dict:
-        
+
+    def update_transformations(self, transformations: List[TransformationBase]) -> dict:
         response = self._get(f"studios/{self.tool_id}/get", cast_to=dict)
         current_state = response["studio"].get("state_mapping", {})
 
-        state_mapping = {
-            **current_state, 
-            **{
-                step.name: f"steps.{step.name}.output"
-                for step in transformations
-            }
-        }
-        
-        transformation_config = {
-            "steps": [
-                transform.model_dump(exclude_none=True)
-                for transform in transformations
-            ]
-        }
-        
+        state_mapping = {**current_state, **{step.name: f"steps.{step.name}.output" for step in transformations}}
+
+        transformation_config = {"steps": [transform.model_dump(exclude_none=True) for transform in transformations]}
+
         path = "studios/bulk_update"
         body = {
-            "updates": [{
-                "studio_id": self.tool_id,
-                "transformations": transformation_config,
-                "state_mapping": state_mapping
-            }],
-            "partial_update": True
+            "updates": [
+                {"studio_id": self.tool_id, "transformations": transformation_config, "state_mapping": state_mapping}
+            ],
+            "partial_update": True,
         }
-        
+
         return self._post(path, body=body, cast_to=dict)
-    
+
     def update_outputs(
-        self, 
+        self,
         last_step: bool = True,
         output_mapping: Optional[dict] = None,
         output_schema_properties: Optional[dict] = None,
-    ) -> dict: 
+    ) -> dict:
         response = self._get(f"studios/{self.tool_id}/get", cast_to=dict)
         current_steps = response["studio"].get("transformations", {}).get("steps", [])
-        
+
         transformations = {"steps": current_steps}
         transformations["output"] = output_mapping if not last_step else None
 
@@ -149,31 +120,26 @@ class Tool(SyncAPIResource):
         }
 
         if output_schema_properties:
-            updates["output_schema"] = {
-                "properties": output_schema_properties
-            }
+            updates["output_schema"] = {"properties": output_schema_properties}
 
         path = "studios/bulk_update"
-        body = {
-            "updates": [updates],
-            "partial_update": True
-        }
+        body = {"updates": [updates], "partial_update": True}
 
         return self._post(path, body=body, cast_to=dict)
-    
+
     def get_link(self):
         return f"https://app.relevanceai.com/agents/{self._client.region}/{self._client.project}/{self.tool_id}"
 
     def __repr__(self):
         return f'Tool(tool_id="{self.tool_id}")'
-    
+
+
 class AsyncTool(AsyncAPIResource):
     _client: AsyncRelevanceAI
 
     def __init__(self, client: AsyncRelevanceAI, tool_id: str, **kwargs):
         super().__init__(client=client)
         self.tool_id = tool_id
-
 
     async def update(self, updates: dict, partial_update: Optional[bool] = True) -> dict:
         path = "studios/bulk_update"
@@ -199,12 +165,12 @@ class AsyncTool(AsyncAPIResource):
         response = await self._get(f"studios/{self.tool_id}/get", cast_to=dict)
         steps_schema = response["studio"]["transformations"]["steps"]
         return steps_schema
-    
+
     async def update_metadata(
         self,
         title: str | None = None,
-        description: str | None = None, 
-        public: bool | None = None, 
+        description: str | None = None,
+        public: bool | None = None,
     ):
         response = await self._get(f"studios/{self.tool_id}/get", cast_to=dict)
 
@@ -216,25 +182,14 @@ class AsyncTool(AsyncAPIResource):
         }
 
         path = "studios/bulk_update"
-        body = {
-            "updates": [updates],
-            "partial_update": True
-        }
+        body = {"updates": [updates], "partial_update": True}
         response = await self._post(path, body=body, cast_to=dict)
         return response
 
     async def update_params(self, params: Dict[str, ParamsBase]) -> dict:
-        params_schema = {
-            "properties": {},
-            "required": [],
-            "type": "object"
-        }
-        
-        param_values = {
-            field_name: param.value
-            for field_name, param in params.items()
-            if param.value is not None
-        }
+        params_schema = {"properties": {}, "required": [], "type": "object"}
+
+        param_values = {field_name: param.value for field_name, param in params.items() if param.value is not None}
 
         for field_name, param in params.items():
             param_dict = param.model_dump(exclude_none=True)
@@ -242,69 +197,52 @@ class AsyncTool(AsyncAPIResource):
             if param.required:
                 params_schema["required"].append(field_name)
 
-        state_mapping = {
-            field_name: f"params.{field_name}" 
-            for field_name in params.keys()
-        }
+        state_mapping = {field_name: f"params.{field_name}" for field_name in params.keys()}
 
         path = "studios/bulk_update"
         body = {
-            "updates": [{
-                "studio_id": self.tool_id,
-                "params": param_values,
-                "params_schema": params_schema,
-                "state_mapping": state_mapping
-            }],
-            "partial_update": True
+            "updates": [
+                {
+                    "studio_id": self.tool_id,
+                    "params": param_values,
+                    "params_schema": params_schema,
+                    "state_mapping": state_mapping,
+                }
+            ],
+            "partial_update": True,
         }
-        
+
         response = await self._post(path, body=body, cast_to=dict)
         return response
-        
-    async def update_transformations(
-        self,
-        transformations: List[TransformationBase],
-    ) -> dict:
+
+    async def update_transformations(self, transformations: List[TransformationBase]) -> dict:
         response = await self._get(f"studios/{self.tool_id}/get", cast_to=dict)
         current_state = response["studio"].get("state_mapping", {})
 
-        state_mapping = {
-            **current_state, 
-            **{
-                step.name: f"steps.{step.name}.output"
-                for step in transformations
-            }
-        }
-        
-        transformation_config = {
-            "steps": [
-                transform.model_dump(exclude_none=True)
-                for transform in transformations
-            ]
-        }
-        
+        state_mapping = {**current_state, **{step.name: f"steps.{step.name}.output" for step in transformations}}
+
+        transformation_config = {"steps": [transform.model_dump(exclude_none=True) for transform in transformations]}
+
         path = "studios/bulk_update"
         body = {
-            "updates": [{
-                "studio_id": self.tool_id,
-                "transformations": transformation_config,
-                "state_mapping": state_mapping
-            }],
-            "partial_update": True
+            "updates": [
+                {"studio_id": self.tool_id, "transformations": transformation_config, "state_mapping": state_mapping}
+            ],
+            "partial_update": True,
         }
-        
+
         response = await self._post(path, body=body, cast_to=dict)
         return response
-    
+
     async def update_outputs(
-        self, 
+        self,
         last_step: bool = True,
         output_mapping: Optional[dict] = None,
         output_schema_properties: Optional[dict] = None,
     ) -> dict:
         response = await self._get(f"studios/{self.tool_id}/get", cast_to=dict)
         current_steps = response["studio"].get("transformations", {}).get("steps", [])
-        
+
         transformations = {"steps": current_steps}
         transformations["output"] = output_mapping if not last_step else None
 
@@ -314,15 +252,10 @@ class AsyncTool(AsyncAPIResource):
         }
 
         if output_schema_properties:
-            updates["output_schema"] = {
-                "properties": output_schema_properties
-            }
+            updates["output_schema"] = {"properties": output_schema_properties}
 
         path = "studios/bulk_update"
-        body = {
-            "updates": [updates],
-            "partial_update": True
-        }
+        body = {"updates": [updates], "partial_update": True}
 
         response = await self._post(path, body=body, cast_to=dict)
         return response

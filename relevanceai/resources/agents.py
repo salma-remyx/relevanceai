@@ -7,24 +7,15 @@ from ..resources.agent import Agent, AsyncAgent
 
 
 class AgentsManager(SyncAPIResource):
-
     _client: RelevanceAI
 
     def list_agents(self) -> list[Agent]:
         path = "agents/list"
         response = self._post(path, cast_to=dict)
-        agents = [
-            Agent(client=self._client, **item)
-            for item in response.get("results", [])
-        ]
-        return sorted(
-            agents, key=lambda x: (x.metadata.get("name") is None, x.metadata.get("name") or "")
-        )
+        agents = [Agent(client=self._client, **item) for item in response.get("results", [])]
+        return sorted(agents, key=lambda x: (x.metadata.get("name") is None, x.metadata.get("name") or ""))
 
-    def retrieve_agent(
-        self,
-        agent_id: str,
-    ) -> Agent:
+    def retrieve_agent(self, agent_id: str) -> Agent:
         path = f"agents/{agent_id}/get"
         response = self._get(path, cast_to=dict)
         return Agent(client=self._client, **response["agent"])
@@ -79,10 +70,7 @@ class AgentsManager(SyncAPIResource):
         agent = self.retrieve_agent(response["agent_id"])
         return agent
 
-    def delete_agent(
-        self,
-        agent_id: str,
-    ) -> bool:
+    def delete_agent(self, agent_id: str) -> bool:
         path = f"agents/{agent_id}/delete"
         response = self._post(path)
         return response.status_code == 200
@@ -94,21 +82,16 @@ class AsyncAgentsManager(AsyncAPIResource):
     async def list_agents(self) -> list[AsyncAgent]:
         path = "agents/list"
         response = await self._post(path, cast_to=dict)
-        agents = [
-            AsyncAgent(client=self._client, **item)
-            for item in response.get("results", [])
-        ]
+        agents = [AsyncAgent(client=self._client, **item) for item in response.get("results", [])]
         return sorted(
-            agents, key=lambda x: (
+            agents,
+            key=lambda x: (
                 x.get("metadata", {}).get("name", None) is None,
-                x.get("metadata", {}).get("name", "") or ""
-            )
+                x.get("metadata", {}).get("name", "") or "",
+            ),
         )
 
-    async def retrieve_agent(
-        self,
-        agent_id: str,
-    ) -> AsyncAgent:
+    async def retrieve_agent(self, agent_id: str) -> AsyncAgent:
         path = f"agents/{agent_id}/get"
         response = await self._get(path, cast_to=dict)
         return AsyncAgent(client=self._client, **response["agent"])
@@ -137,10 +120,7 @@ class AsyncAgentsManager(AsyncAPIResource):
         agent = await self.retrieve_agent(response["agent_id"])
         return agent
 
-    async def delete_agent(
-        self,
-        agent_id: str,
-    ) -> bool:
+    async def delete_agent(self, agent_id: str) -> bool:
         path = f"agents/{agent_id}/delete"
         response = await self._post(path)
         return response.status_code == 200

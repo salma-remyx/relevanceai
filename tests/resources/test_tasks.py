@@ -2,6 +2,7 @@ import pytest
 from unittest.mock import MagicMock
 from relevanceai.resources.tasks import Tasks
 
+
 class TestTasks:
     @pytest.fixture
     def mock_client(self):
@@ -20,10 +21,7 @@ class TestTasks:
 
         result = tasks.get_metadata("conversation-123")
 
-        tasks._get.assert_called_once_with(
-            "knowledge/sets/conversation-123/get_metadata",
-            cast_to=dict
-        )
+        tasks._get.assert_called_once_with("knowledge/sets/conversation-123/get_metadata", cast_to=dict)
         assert isinstance(result, dict)
         assert result == {}
 
@@ -34,10 +32,7 @@ class TestTasks:
 
         result = tasks.get_metadata("conversation-123")
 
-        tasks._get.assert_called_once_with(
-            "knowledge/sets/conversation-123/get_metadata",
-            cast_to=dict
-        )
+        tasks._get.assert_called_once_with("knowledge/sets/conversation-123/get_metadata", cast_to=dict)
         assert isinstance(result, dict)
         assert result == {}
 
@@ -49,10 +44,7 @@ class TestTasks:
 
         result = tasks.delete_task("conversation-123")
 
-        tasks._post.assert_called_once_with(
-            path="knowledge/sets/delete",
-            body={"knowledge_set": ["conversation-123"]}
-        )
+        tasks._post.assert_called_once_with(path="knowledge/sets/delete", body={"knowledge_set": ["conversation-123"]})
         assert result is True
 
     def test_delete_task_failure(self, tasks):
@@ -63,8 +55,5 @@ class TestTasks:
 
         result = tasks.delete_task("conversation-123")
 
-        tasks._post.assert_called_once_with(
-            path="knowledge/sets/delete",
-            body={"knowledge_set": ["conversation-123"]}
-        )
+        tasks._post.assert_called_once_with(path="knowledge/sets/delete", body={"knowledge_set": ["conversation-123"]})
         assert result is False

@@ -21,7 +21,7 @@ class TestAgentsManager:
             "results": [
                 {"agent_id": "agent-1", "name": "Agent 1", "_id": "id-1", "project": "default"},
                 {"agent_id": "agent-2", "name": None, "_id": "id-2", "project": "default"},
-                {"agent_id": "agent-3", "name": "Agent 3", "_id": "id-3", "project": "default"}
+                {"agent_id": "agent-3", "name": "Agent 3", "_id": "id-3", "project": "default"},
             ]
         }
         agents_manager._post = MagicMock(return_value=mock_response)
@@ -36,12 +36,7 @@ class TestAgentsManager:
     def test_retrieve_agent(self, agents_manager):
         """Test retrieving a specific agent."""
         mock_response = {
-            "agent": {
-                "agent_id": "test-agent",
-                "name": "Test Agent",
-                "_id": "test-id",
-                "project": "default"
-            }
+            "agent": {"agent_id": "test-agent", "name": "Test Agent", "_id": "test-id", "project": "default"}
         }
         agents_manager._get = MagicMock(return_value=mock_response)
 
@@ -65,16 +60,12 @@ class TestAgentsManager:
             model="gpt-4",
             temperature=0.7,
             _id="new-id",
-            project="default"
+            project="default",
         )
         agents_manager.retrieve_agent = MagicMock(return_value=mock_agent)
 
         result = agents_manager.upsert_agent(
-            agent_id="new-agent",
-            name="New Agent",
-            system_prompt="Test prompt",
-            model="gpt-4",
-            temperature=0.7
+            agent_id="new-agent", name="New Agent", system_prompt="Test prompt", model="gpt-4", temperature=0.7
         )
 
         agents_manager._post.assert_called_once_with(
@@ -84,9 +75,9 @@ class TestAgentsManager:
                 "name": "New Agent",
                 "system_prompt": "Test prompt",
                 "model": "gpt-4",
-                "temperature": 0.7
+                "temperature": 0.7,
             },
-            cast_to=dict
+            cast_to=dict,
         )
         agents_manager.retrieve_agent.assert_called_once_with("new-agent")
         assert isinstance(result, Agent)
@@ -98,21 +89,12 @@ class TestAgentsManager:
         mock_upsert_response.json.return_value = {"agent_id": "new-agent"}
         agents_manager._post = MagicMock(return_value=mock_upsert_response)
 
-        mock_agent = Agent(
-            client=agents_manager._client,
-            agent_id="new-agent",
-            _id="new-id",
-            project="default"
-        )
+        mock_agent = Agent(client=agents_manager._client, agent_id="new-agent", _id="new-id", project="default")
         agents_manager.retrieve_agent = MagicMock(return_value=mock_agent)
 
         result = agents_manager.upsert_agent(agent_id="new-agent")
 
-        agents_manager._post.assert_called_once_with(
-            "/agents/upsert",
-            body={"agent_id": "new-agent"},
-            cast_to=dict
-        )
+        agents_manager._post.assert_called_once_with("/agents/upsert", body={"agent_id": "new-agent"}, cast_to=dict)
         assert isinstance(result, Agent)
         assert result.agent_id == "new-agent"
 

@@ -9,13 +9,9 @@ from ..resources.tool import Tool, AsyncTool
 
 
 class ToolsManager(SyncAPIResource):
-
     _client: RelevanceAI
 
-    def list_tools(
-        self,
-        max_results: Optional[int] = 100,
-    ) -> List[Tool]:
+    def list_tools(self, max_results: Optional[int] = 100) -> List[Tool]:
         path = "studios/list"
         params = {
             "filters": json.dumps(
@@ -31,22 +27,22 @@ class ToolsManager(SyncAPIResource):
             "page_size": max_results,
         }
         response = self._client.get(path, params=params, cast_to=dict)
-        tools = [Tool(client=self._client, tool_id=item.get('studio_id')) for item in response.get("results", [])]
+        tools = [Tool(client=self._client, tool_id=item.get("studio_id")) for item in response.get("results", [])]
         return tools
-    
+
     def retrieve_tool(self, tool_id: str) -> Tool:
         path = f"studios/{tool_id}/get"
         response = self._get(path, cast_to=dict)
         return Tool(client=self._client, tool_id=response["studio"].get("studio_id"))
-    
+
     def create_tool(
-        self, 
-        title: str, 
-        description: str, 
+        self,
+        title: str,
+        description: str,
         public: bool = False,
         params_schema: Optional[dict] = None,
         output_schema: Optional[dict] = None,
-        transformations: Optional[dict] = None
+        transformations: Optional[dict] = None,
     ) -> Tool:
         tool_id = str(uuid.uuid4())
         path = "studios/bulk_update"
@@ -61,28 +57,21 @@ class ToolsManager(SyncAPIResource):
                     "params_schema": params_schema or {"properties": {}, "required": [], "type": "object"},
                     "output_schema": output_schema or {},
                     "transformations": transformations or {"steps": []},
-                    "studio_id": tool_id
+                    "studio_id": tool_id,
                 }
             ],
-            "partial_update": True
+            "partial_update": True,
         }
         _ = self._post(path, body=body)
         tool = self.retrieve_tool(tool_id)
         return tool
 
-    def clone_tool(
-        self,
-        tool_id,
-    ) -> Optional[Tool]: 
+    def clone_tool(self, tool_id: str) -> Optional[Tool]:
         path = "/studios/clone"
-        body = {
-            "studio_id": tool_id,
-            "project": self._client.project,
-            "region": self._client.region
-        }
+        body = {"studio_id": tool_id, "project": self._client.project, "region": self._client.region}
         response = self._post(path, body=body, cast_to=dict)
         cloned_tool_id = response.get("studio_id", None)
-        if cloned_tool_id: 
+        if cloned_tool_id:
             tool = self.retrieve_tool(cloned_tool_id)
             return tool
         else:
@@ -96,7 +85,6 @@ class ToolsManager(SyncAPIResource):
 
 
 class AsyncToolsManager(AsyncAPIResource):
-
     _client: AsyncRelevanceAI
 
     async def list_tools(self, max_results: Optional[int] = 100) -> List[AsyncTool]:
@@ -115,22 +103,22 @@ class AsyncToolsManager(AsyncAPIResource):
             "page_size": max_results,
         }
         response = await self._client.get(path, params=params, cast_to=dict)
-        tools = [AsyncTool(client=self._client, tool_id=item.get('studio_id')) for item in response.get("results", [])]
+        tools = [AsyncTool(client=self._client, tool_id=item.get("studio_id")) for item in response.get("results", [])]
         return tools
-    
+
     async def retrieve_tool(self, tool_id: str) -> AsyncTool:
         path = f"studios/{tool_id}/get"
         response = await self._get(path, cast_to=dict)
         return AsyncTool(client=self._client, tool_id=response["studio"].get("studio_id"))
-    
+
     async def create_tool(
-        self, 
-        title: str, 
-        description: str, 
+        self,
+        title: str,
+        description: str,
         public: bool = False,
         params_schema: Optional[dict] = None,
         output_schema: Optional[dict] = None,
-        transformations: Optional[dict] = None
+        transformations: Optional[dict] = None,
     ) -> AsyncTool:
         tool_id = str(uuid.uuid4())
         path = "studios/bulk_update"
@@ -145,10 +133,10 @@ class AsyncToolsManager(AsyncAPIResource):
                     "params_schema": params_schema or {"properties": {}, "required": [], "type": "object"},
                     "output_schema": output_schema or {},
                     "transformations": transformations or {"steps": []},
-                    "studio_id": tool_id
+                    "studio_id": tool_id,
                 }
             ],
-            "partial_update": True
+            "partial_update": True,
         }
         _ = await self._post(path, body=body)
         tool = await self.retrieve_tool(tool_id)
@@ -156,11 +144,7 @@ class AsyncToolsManager(AsyncAPIResource):
 
     async def clone_tool(self, tool_id: str) -> Optional[AsyncTool]:
         path = "/studios/clone"
-        body = {
-            "studio_id": tool_id,
-            "project": self._client.project,
-            "region": self._client.region
-        }
+        body = {"studio_id": tool_id, "project": self._client.project, "region": self._client.region}
         response = await self._post(path, body=body, cast_to=dict)
         cloned_tool_id = response.get("studio_id", None)
         if cloned_tool_id:

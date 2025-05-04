@@ -1,11 +1,11 @@
-
 """
 Trigger and poll for task outputs of agents
 """
 
 from textwrap import dedent
-import time 
+import time
 from dotenv import load_dotenv
+
 load_dotenv()
 
 from relevanceai import RelevanceAI
@@ -20,11 +20,9 @@ Research the following company:
 RelevanceAI relevanceai.com      
 """)
 
-task = my_agent.trigger_task(
-    message=message
-)
+task = my_agent.trigger_task(message=message)
 
-while not my_agent.get_task_output_preview(task.conversation_id): 
+while not my_agent.get_task_output_preview(task.conversation_id):
     print("polling...\n")
     time.sleep(5)
 

@@ -7,7 +7,6 @@ from ..types.knowledge import Metadata
 
 
 class Tasks(SyncAPIResource):
-
     _client: RelevanceAI
 
     def get_metadata(self, conversation_id: str) -> Union[Metadata, dict]:
@@ -21,8 +20,8 @@ class Tasks(SyncAPIResource):
         response = self._post(path=path, body=body)
         return response.status_code == 200
 
-class AsyncTasks(AsyncAPIResource):
 
+class AsyncTasks(AsyncAPIResource):
     _client: AsyncRelevanceAI
 
     async def get_metadata(self, conversation_id: str) -> Union[Metadata, dict]:

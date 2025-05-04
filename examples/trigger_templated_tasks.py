@@ -1,14 +1,14 @@
-
 """
 Trigger templated tasks. (from .csv file)
 """
 
-import time 
+import time
 import csv
 from textwrap import dedent
 
 from relevanceai import RelevanceAI
 from dotenv import load_dotenv
+
 load_dotenv()
 
 client = RelevanceAI()
@@ -22,7 +22,6 @@ with open(path, "r") as f:
     reader = csv.reader(f)
     next(reader)  # Skip the header
     for i, r in enumerate(reader):
-
         print(f"Row {i}...")
 
         row = {
@@ -37,7 +36,7 @@ with open(path, "r") as f:
             "rating": r[8],
             "lead_owner": r[9],
         }
-        
+
         message = dedent(f"""
         Outreach to the following prospect: 
                          

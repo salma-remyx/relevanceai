@@ -5,8 +5,8 @@ from .._client import RelevanceAI
 from .._resource import SyncAPIResource
 from ..types.oauth import OAuth
 
-class OAuthManager(SyncAPIResource):
 
+class OAuthManager(SyncAPIResource):
     _client: RelevanceAI
 
     def add_google_integration(self, auto_open: bool = False) -> str:

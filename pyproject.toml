@@ -20,6 +20,14 @@ ruff = "^0.11.8"
 [tool.poetry.group.test.dependencies]
 pytest = "8.3.4"
 
+[tool.ruff]
+line-length = 120
+extend-exclude = ["*/types/*"]
+
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["E402"]
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

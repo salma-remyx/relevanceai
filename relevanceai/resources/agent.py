@@ -9,6 +9,7 @@ from ..resources.tool import Tool
 from ..types.params import ParamsBase
 from ..types.task import Task
 
+
 class Agent(SyncAPIResource):
     _client: RelevanceAI
 
@@ -21,23 +22,17 @@ class Agent(SyncAPIResource):
         path = "agents/tools/list"
         body = {"agent_ids": [self.agent_id]}
         response = self._post(path, body=body, cast_to=dict)
-        tools = [
-            Tool(client=self._client, **item)
-            for item in response.get("results", [])
-        ]
-        tools = [tool for tool in tools if tool['metadata'].get('type') != "agent"]
-        return sorted(tools, key=lambda x: x['metadata'].get('title') or "")
+        tools = [Tool(client=self._client, **item) for item in response.get("results", [])]
+        tools = [tool for tool in tools if tool["metadata"].get("type") != "agent"]
+        return sorted(tools, key=lambda x: x["metadata"].get("title") or "")
 
     def list_subagents(self) -> list[Tool]:
         path = "agents/tools/list"
         body = {"agent_ids": [self.agent_id]}
         response = self._post(path, body=body, cast_to=dict)
-        tools = [
-            Tool(client=self._client, **item)
-            for item in response.get("results", [])
-        ]
-        tools = [tool for tool in tools if tool['metadata'].get('type') == "agent"]
-        return sorted(tools, key=lambda x: x['metadata'].get('title') or "")
+        tools = [Tool(client=self._client, **item) for item in response.get("results", [])]
+        tools = [tool for tool in tools if tool["metadata"].get("type") == "agent"]
+        return sorted(tools, key=lambda x: x["metadata"].get("title") or "")
 
     def retrieve_task(self, conversation_id: str) -> Task:
         task_items = self.list_tasks(self.agent_id)
@@ -89,11 +84,7 @@ class Agent(SyncAPIResource):
         response = self._get(path, params=params, cast_to=dict)
         tasks = [Task(**item) for item in response["results"]]
         if state:
-            tasks = [
-                task
-                for task in tasks
-                if task.metadata.conversation.state.value == state
-            ]
+            tasks = [task for task in tasks if task.metadata.conversation.state.value == state]
         return tasks
 
     def view_task_steps(self, conversation_id: str):
@@ -111,9 +102,7 @@ class Agent(SyncAPIResource):
             action = t.get("content", {}).get("action_details", {}).get("action")
             action_request_id = t.get("content", {}).get("action_details", {}).get("action_request_id")
 
-            triggered_task = self.trigger_task_from_action(
-                conversation_id, action, action_request_id
-            )
+            triggered_task = self.trigger_task_from_action(conversation_id, action, action_request_id)
             return triggered_task
         return None
 
@@ -192,7 +181,7 @@ class Agent(SyncAPIResource):
 
     def remove_all_tools(self, partial_update: Optional[bool] = True) -> dict:
         path = "agents/upsert"
-        self.metadata['actions'] = []
+        self.metadata["actions"] = []
         body = {
             "agent_id": self.agent_id,
             "actions": [],
@@ -202,22 +191,20 @@ class Agent(SyncAPIResource):
 
     def add_tool(self, tool_id: str, partial_update: Optional[bool] = True) -> dict:
         path = "agents/upsert"
-        self.metadata['actions'].append({"chain_id": tool_id})
+        self.metadata["actions"].append({"chain_id": tool_id})
         body = {
             "agent_id": self.agent_id,
-            "actions": self.metadata['actions'],
+            "actions": self.metadata["actions"],
             "partial_update": partial_update,
         }
         return self._post(path, body=body, cast_to=dict)
 
     def remove_tool(self, tool_id: str, partial_update: Optional[bool] = True) -> dict:
         path = "agents/upsert"
-        self.metadata['actions'] = [
-            action for action in self.metadata['actions'] if action['chain_id'] != tool_id
-        ]
+        self.metadata["actions"] = [action for action in self.metadata["actions"] if action["chain_id"] != tool_id]
         body = {
             "agent_id": self.agent_id,
-            "actions": self.metadata['actions'],
+            "actions": self.metadata["actions"],
             "partial_update": partial_update,
         }
         return self._post(path, body=body, cast_to=dict)
@@ -230,40 +217,34 @@ class Agent(SyncAPIResource):
     ):
         path = "agents/upsert"
         subagent = self._client.agents.retrieve_agent(agent_id=agent_id)
-        if self.metadata.get('actions', None) is None:
-            self.metadata['actions'] = []
-        self.metadata['actions'].append(
+        if self.metadata.get("actions", None) is None:
+            self.metadata["actions"] = []
+        self.metadata["actions"].append(
             {
                 "action_behaviour": action_behaviour,
-                "agent_id": subagent.metadata['agent_id'],
+                "agent_id": subagent.metadata["agent_id"],
                 "default_values": {},
-                "title": subagent.metadata['name'],
+                "title": subagent.metadata["name"],
             }
         )
         body = {
             "agent_id": self.agent_id,
-            "actions": self.metadata['actions'],
+            "actions": self.metadata["actions"],
             "partial_update": partial_update,
         }
         return self._post(path, body=body, cast_to=dict)
 
     def remove_subagent(self, agent_id: str, partial_update: Optional[bool] = True):
         path = "agents/upsert"
-        self.metadata['actions'] = [
-            action
-            for action in self.metadata['actions']
-            if action.get("agent_id") != agent_id
-        ]
+        self.metadata["actions"] = [action for action in self.metadata["actions"] if action.get("agent_id") != agent_id]
         body = {
             "agent_id": self.agent_id,
-            "actions": self.metadata['actions'],
+            "actions": self.metadata["actions"],
             "partial_update": partial_update,
         }
         return self._post(path, body=body, cast_to=dict)
 
-    def update_core_instructions(
-        self, core_instructions: str, partial_update: Optional[bool] = True
-    ):
+    def update_core_instructions(self, core_instructions: str, partial_update: Optional[bool] = True):
         path = "agents/upsert"
         body = {
             "agent_id": self.agent_id,
@@ -272,19 +253,13 @@ class Agent(SyncAPIResource):
         }
         return self._post(path, body=body, cast_to=dict)
 
-    def update_template_settings(
-        self, params: dict[str, ParamsBase], partial_update: Optional[bool] = True
-    ):
+    def update_template_settings(self, params: dict[str, ParamsBase], partial_update: Optional[bool] = True):
         params_schema = {
             "properties": {},
             "required": [],
         }
 
-        param_values = {
-            field_name: param.value
-            for field_name, param in params.items()
-            if param.value is not None
-        }
+        param_values = {field_name: param.value for field_name, param in params.items() if param.value is not None}
 
         for field_name, param in params.items():
             param_dict = param.model_dump(exclude_none=True)
@@ -302,7 +277,7 @@ class Agent(SyncAPIResource):
         }
         return self._post(path, body=body, cast_to=dict)
 
-    def add_google_trigger(self, oauth_account_id:str, oauth_account_label:str) -> dict:
+    def add_google_trigger(self, oauth_account_id: str, oauth_account_label: str) -> dict:
         document_id = str(uuid.uuid4())
         path = f"syncs/items/{document_id}/upsert"
         body = {
@@ -347,22 +322,16 @@ class AsyncAgent(AsyncAPIResource):
         path = "agents/tools/list"
         body = {"agent_ids": [self.agent_id]}
         response = await self._post(path, body=body, cast_to=dict)
-        tools = [
-            Tool(client=self._client, **item)
-            for item in response.get("results", [])
-        ]
-        tools = [tool for tool in tools if tool['metadata'].get('type') != "agent"]
+        tools = [Tool(client=self._client, **item) for item in response.get("results", [])]
+        tools = [tool for tool in tools if tool["metadata"].get("type") != "agent"]
         return sorted(tools, key=lambda x: x.metadata.title or "")
 
     async def list_subagents(self) -> list[Tool]:
         path = "agents/tools/list"
         body = {"agent_ids": [self.agent_id]}
         response = await self._post(path, body=body, cast_to=dict)
-        tools = [
-            Tool(client=self._client, **item)
-            for item in response.get("results", [])
-        ]
-        tools = [tool for tool in tools if tool['metadata'].get('type') == "agent"]
+        tools = [Tool(client=self._client, **item) for item in response.get("results", [])]
+        tools = [tool for tool in tools if tool["metadata"].get("type") == "agent"]
         return sorted(tools, key=lambda x: x.metadata.title or "")
 
     async def retrieve_task(self, conversation_id: str) -> Task:
@@ -411,11 +380,7 @@ class AsyncAgent(AsyncAPIResource):
         response = await self._get(path, params=params, cast_to=dict)
         tasks = [Task(**item) for item in response["results"]]
         if state:
-            tasks = [
-                task
-                for task in tasks
-                if task.metadata.conversation.state.value == state
-            ]
+            tasks = [task for task in tasks if task.metadata.conversation.state.value == state]
         return tasks
 
     async def view_task_steps(self, conversation_id: str):
@@ -437,9 +402,7 @@ class AsyncAgent(AsyncAPIResource):
             action = t.get("content", {}).get("action_details", {}).get("action")
             action_request_id = t.get("content", {}).get("action_details", {}).get("action_request_id")
 
-            triggered_task = await self.trigger_task_from_action(
-                conversation_id, action, action_request_id
-            )
+            triggered_task = await self.trigger_task_from_action(conversation_id, action, action_request_id)
             return triggered_task
         return None
 
@@ -539,9 +502,7 @@ class AsyncAgent(AsyncAPIResource):
 
     async def remove_tool(self, tool_id: str, partial_update: bool = True) -> None:
         path = "agents/upsert"
-        self.metadata.actions = [
-            action for action in self.metadata.actions if action["chain_id"] != tool_id
-        ]
+        self.metadata.actions = [action for action in self.metadata.actions if action["chain_id"] != tool_id]
         body = {
             "agent_id": self.agent_id,
             "actions": self.metadata.actions,
@@ -576,11 +537,7 @@ class AsyncAgent(AsyncAPIResource):
 
     async def remove_subagent(self, agent_id: str, partial_update: bool = True) -> dict:
         path = "agents/upsert"
-        self.metadata.actions = [
-            action
-            for action in self.metadata.actions
-            if action.get("agent_id") != agent_id
-        ]
+        self.metadata.actions = [action for action in self.metadata.actions if action.get("agent_id") != agent_id]
         body = {
             "agent_id": self.agent_id,
             "actions": self.metadata.actions,
@@ -603,11 +560,7 @@ class AsyncAgent(AsyncAPIResource):
             "required": [],
         }
 
-        param_values = {
-            field_name: param.value
-            for field_name, param in params.items()
-            if param.value is not None
-        }
+        param_values = {field_name: param.value for field_name, param in params.items() if param.value is not None}
 
         for field_name, param in params.items():
             param_dict = param.model_dump(exclude_none=True)

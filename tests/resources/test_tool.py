@@ -2,6 +2,7 @@ import pytest
 from unittest.mock import MagicMock
 from relevanceai.resources.tool import Tool
 
+
 class TestTool:
     @pytest.fixture
     def mock_client(self):
@@ -22,9 +23,7 @@ class TestTool:
 
     def test_update(self, tool):
         """Test updating tool properties."""
-        mock_response = {
-            "status": "success"
-        }
+        mock_response = {"status": "success"}
         tool._post = MagicMock(return_value=mock_response)
 
         updates = {"title": "Updated Tool"}
@@ -32,22 +31,14 @@ class TestTool:
 
         tool._post.assert_called_once_with(
             "studios/bulk_update",
-            body={
-                "partial_update": True,
-                "updates": [{"title": "Updated Tool", "studio_id": "test-tool"}]
-            },
-            cast_to=dict
+            body={"partial_update": True, "updates": [{"title": "Updated Tool", "studio_id": "test-tool"}]},
+            cast_to=dict,
         )
         assert result == {"status": "success"}
 
     def test_trigger(self, tool):
         """Test triggering a tool."""
-        mock_response = {
-            "output": {"result": "test output"},  
-            "status": "complete",                
-            "errors": [],                         
-            "executionTime": 1.23                
-        }
+        mock_response = {"output": {"result": "test output"}, "status": "complete", "errors": [], "executionTime": 1.23}
         tool._post = MagicMock(return_value=mock_response)
 
         params = {"param1": "value1"}
@@ -56,18 +47,16 @@ class TestTool:
         tool._post.assert_called_once_with(
             path=f"studios/{tool.tool_id}/trigger_limited",
             body={"params": params, "project": tool._client.project},
-            cast_to=dict
+            cast_to=dict,
         )
-        assert result['output'] == {"result": "test output"}
-        assert result['status'] == "complete" 
-        assert result['errors'] == []
-        assert result['executionTime'] == 1.23
+        assert result["output"] == {"result": "test output"}
+        assert result["status"] == "complete"
+        assert result["errors"] == []
+        assert result["executionTime"] == 1.23
 
     def test_get_params_schema(self, tool):
         """Test getting params schema."""
-        mock_response = {
-            "studio": {"params_schema": {"properties": {"test": "schema"}}}
-        }
+        mock_response = {"studio": {"params_schema": {"properties": {"test": "schema"}}}}
         tool._get = MagicMock(return_value=mock_response)
 
         result = tool.get_params_schema()
@@ -75,40 +64,25 @@ class TestTool:
 
     def test_update_metadata(self, tool):
         """Test updating tool metadata."""
-        get_response = {
-            "studio": {
-                "title": "Old Title",
-                "description": "Old Description",
-                "public": False
-            }
-        }
+        get_response = {"studio": {"title": "Old Title", "description": "Old Description", "public": False}}
         tool._get = MagicMock(return_value=get_response)
 
-        post_response = {
-            "status": "success"
-        }
+        post_response = {"status": "success"}
         tool._post = MagicMock(return_value=post_response)
 
-        result = tool.update_metadata(
-            title="New Title",
-            description="New Description",
-            public=True
-        )
+        result = tool.update_metadata(title="New Title", description="New Description", public=True)
 
         tool._post.assert_called_once_with(
             "studios/bulk_update",
             body={
-                "updates": [{
-                    "studio_id": "test-tool",
-                    "title": "New Title",
-                    "description": "New Description",
-                    "public": True
-                }],
-                "partial_update": True
+                "updates": [
+                    {"studio_id": "test-tool", "title": "New Title", "description": "New Description", "public": True}
+                ],
+                "partial_update": True,
             },
-            cast_to=dict
+            cast_to=dict,
         )
-        assert result['status'] == "success"
+        assert result["status"] == "success"
 
     def test_get_link(self, tool):
         """Test getting the web link for a tool."""

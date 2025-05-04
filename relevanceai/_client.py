@@ -11,7 +11,6 @@ from ._base_client import SyncAPIClient, AsyncAPIClient
 
 
 class RelevanceAI(SyncAPIClient):
-
     agents: resources.AgentsManager
     tasks: resources.Tasks
     tools: resources.ToolsManager
@@ -30,7 +29,6 @@ class RelevanceAI(SyncAPIClient):
         project: str | None = None,
         base_url: str | httpx.URL | None = None,
     ) -> None:
-
         if api_key is None:
             api_key = os.environ.get("RAI_API_KEY")
         if api_key is None:
@@ -81,7 +79,6 @@ class AsyncRelevanceAI(AsyncAPIClient):
         project: str | None = None,
         base_url: str | httpx.URL | None = None,
     ) -> None:
-
         if api_key is None:
             api_key = os.environ.get("RAI_API_KEY")
         if api_key is None:
@@ -120,5 +117,4 @@ class AsyncRelevanceAI(AsyncAPIClient):
 
 
 if __name__ == "__main__":
-
     client = RelevanceAI()

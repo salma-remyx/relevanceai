@@ -1,5 +1,6 @@
 from relevanceai import RelevanceAI
 
+
 class TestRelevanceAI:
     def test_client_init(self):
         client = RelevanceAI(api_key="test_key", region="test_region", project="test_project")
