@@ -1,25 +1,24 @@
 from __future__ import annotations
+from typing import Optional
 
 from .._client import RelevanceAI, AsyncRelevanceAI
 from .._resource import SyncAPIResource, AsyncAPIResource
-
 from ..resources.agent import Agent, AsyncAgent
-from typing import List, Optional
 
 
 class AgentsManager(SyncAPIResource):
 
     _client: RelevanceAI
 
-    def list_agents(self) -> List[Agent]:
+    def list_agents(self) -> list[Agent]:
         path = "agents/list"
-        response = self._post(path)
+        response = self._post(path, cast_to=dict)
         agents = [
             Agent(client=self._client, **item)
-            for item in response.json().get("results", [])
+            for item in response.get("results", [])
         ]
         return sorted(
-            agents, key=lambda x: (x.metadata.name is None, x.metadata.name or "")
+            agents, key=lambda x: (x.metadata.get("name") is None, x.metadata.get("name") or "")
         )
 
     def retrieve_agent(
@@ -27,8 +26,8 @@ class AgentsManager(SyncAPIResource):
         agent_id: str,
     ) -> Agent:
         path = f"agents/{agent_id}/get"
-        response = self._get(path)
-        return Agent(client=self._client, **response.json()["agent"])
+        response = self._get(path, cast_to=dict)
+        return Agent(client=self._client, **response["agent"])
 
     def create_agent(
         self,
@@ -39,7 +38,7 @@ class AgentsManager(SyncAPIResource):
     ) -> Agent:
         existing_agents = self.list_agents()
         for agent in existing_agents:
-            if agent.metadata.name == name:
+            if agent.get("metadata", {}).get("name") == name:
                 raise ValueError(f"Agent with name '{name}' already exists!")
         path = f"/agents/upsert"
         body = {
@@ -52,8 +51,8 @@ class AgentsManager(SyncAPIResource):
             }.items()
             if v is not None
         }
-        response = self._post(path, body=body)
-        agent = self.retrieve_agent(response.json()["agent_id"])
+        response = self._post(path, body=body, cast_to=dict)
+        agent = self.retrieve_agent(response["agent_id"])
         return agent
 
     def upsert_agent(
@@ -76,8 +75,8 @@ class AgentsManager(SyncAPIResource):
             }.items()
             if v is not None
         }
-        response = self._post(path, body=body)
-        agent = self.retrieve_agent(response.json()["agent_id"])
+        response = self._post(path, body=body, cast_to=dict)
+        agent = self.retrieve_agent(response["agent_id"])
         return agent
 
     def delete_agent(
@@ -92,15 +91,18 @@ class AgentsManager(SyncAPIResource):
 class AsyncAgentsManager(AsyncAPIResource):
     _client: AsyncRelevanceAI
 
-    async def list_agents(self) -> List[AsyncAgent]:
+    async def list_agents(self) -> list[AsyncAgent]:
         path = "agents/list"
-        response = await self._post(path)
+        response = await self._post(path, cast_to=dict)
         agents = [
             AsyncAgent(client=self._client, **item)
-            for item in (response.json()).get("results", [])
+            for item in response.get("results", [])
         ]
         return sorted(
-            agents, key=lambda x: (x.metadata.name is None, x.metadata.name or "")
+            agents, key=lambda x: (
+                x.get("metadata", {}).get("name", None) is None,
+                x.get("metadata", {}).get("name", "") or ""
+            )
         )
 
     async def retrieve_agent(
@@ -108,8 +110,8 @@ class AsyncAgentsManager(AsyncAPIResource):
         agent_id: str,
     ) -> AsyncAgent:
         path = f"agents/{agent_id}/get"
-        response = await self._get(path)
-        return AsyncAgent(client=self._client, **response.json()["agent"])
+        response = await self._get(path, cast_to=dict)
+        return AsyncAgent(client=self._client, **response["agent"])
 
     async def upsert_agent(
         self,
@@ -131,8 +133,8 @@ class AsyncAgentsManager(AsyncAPIResource):
             }.items()
             if v is not None
         }
-        response = await self._post(path, body=body)
-        agent = await self.retrieve_agent(response.json()["agent_id"])
+        response = await self._post(path, body=body, cast_to=dict)
+        agent = await self.retrieve_agent(response["agent_id"])
         return agent
 
     async def delete_agent(
