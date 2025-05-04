@@ -22,8 +22,7 @@ class TestToolsManager:
 
     def test_list_tools(self, tools_manager):
         """Test listing tools with successful response."""
-        mock_response = MagicMock()
-        mock_response.json.return_value = {
+        mock_response = {
             "results": [
                 {
                     "studio_id": "tool-1",
@@ -52,30 +51,25 @@ class TestToolsManager:
             }]),
             "page_size": 100
         }
-        tools_manager._client.get.assert_called_once_with("studios/list", params=expected_params)
+        tools_manager._client.get.assert_called_once_with("studios/list", params=expected_params, cast_to=dict)
         assert len(result) == 2
         assert all(isinstance(tool, Tool) for tool in result)
-        assert [tool.metadata.studio_id for tool in result] == ["tool-1", "tool-2"]
+        assert [tool.tool_id for tool in result] == ["tool-1", "tool-2"]
 
     def test_retrieve_tool(self, tools_manager):
         """Test retrieving a specific tool."""
-        mock_response = MagicMock()
-        mock_response.json.return_value = {
+        mock_response = {
             "studio": {
-                "studio_id": "test-tool",
-                "title": "Test Tool",
-                "_id": "test-id",
-                "project": "test-project"
+                "studio_id": "test-tool"
             }
         }
         tools_manager._get = MagicMock(return_value=mock_response)
 
         result = tools_manager.retrieve_tool("test-tool")
 
-        tools_manager._get.assert_called_once_with("studios/test-tool/get")
+        tools_manager._get.assert_called_once_with("studios/test-tool/get", cast_to=dict)
         assert isinstance(result, Tool)
-        assert result.metadata.studio_id == "test-tool"
-        assert result.metadata.title == "Test Tool"
+        assert result.tool_id == "test-tool"
 
     @patch('uuid.uuid4')
     def test_create_tool(self, mock_uuid, tools_manager):
@@ -90,11 +84,7 @@ class TestToolsManager:
         # Mock the retrieve_tool response
         mock_tool = Tool(
             client=tools_manager._client,
-            studio_id="new-tool-id",
-            title="New Tool",
-            description="Test Description",
-            _id="new-id",
-            project="test-project"
+            tool_id="new-tool-id"
         )
         tools_manager.retrieve_tool = MagicMock(return_value=mock_tool)
 
@@ -128,23 +118,18 @@ class TestToolsManager:
         tools_manager._post.assert_called_once_with("studios/bulk_update", body=expected_body)
         tools_manager.retrieve_tool.assert_called_once_with("new-tool-id")
         assert isinstance(result, Tool)
-        assert result.metadata.studio_id == "new-tool-id"
-        assert result.metadata.title == "New Tool"
+        assert result.tool_id == "new-tool-id"
 
     def test_clone_tool_success(self, tools_manager):
         """Test successful tool cloning."""
         # Mock the clone response
-        mock_clone_response = MagicMock()
-        mock_clone_response.json.return_value = {"studio_id": "cloned-tool-id"}
+        mock_clone_response = {"studio_id": "cloned-tool-id"}
         tools_manager._post = MagicMock(return_value=mock_clone_response)
 
         # Mock the retrieve_tool response
         mock_tool = Tool(
             client=tools_manager._client,
-            studio_id="cloned-tool-id",
-            title="Cloned Tool",
-            _id="cloned-id",
-            project="test-project"
+            tool_id="cloned-tool-id"
         )
         tools_manager.retrieve_tool = MagicMock(return_value=mock_tool)
 
@@ -155,15 +140,14 @@ class TestToolsManager:
             "project": "test-project",
             "region": "test-region"
         }
-        tools_manager._post.assert_called_once_with("/studios/clone", body=expected_body)
+        tools_manager._post.assert_called_once_with("/studios/clone", body=expected_body, cast_to=dict)
         tools_manager.retrieve_tool.assert_called_once_with("cloned-tool-id")
         assert isinstance(result, Tool)
-        assert result.metadata.studio_id == "cloned-tool-id"
+        assert result.tool_id == "cloned-tool-id"
 
     def test_clone_tool_failure(self, tools_manager):
         """Test failed tool cloning."""
-        mock_response = MagicMock()
-        mock_response.json.return_value = {}
+        mock_response = {}
         tools_manager._post = MagicMock(return_value=mock_response)
 
         result = tools_manager.clone_tool("original-tool-id")
@@ -173,7 +157,7 @@ class TestToolsManager:
             "project": "test-project",
             "region": "test-region"
         }
-        tools_manager._post.assert_called_once_with("/studios/clone", body=expected_body)
+        tools_manager._post.assert_called_once_with("/studios/clone", body=expected_body, cast_to=dict)
         assert result is False
 
     def test_delete_tool(self, tools_manager):
