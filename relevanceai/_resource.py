@@ -1,8 +1,9 @@
 from __future__ import annotations
 import time
-from typing import TYPE_CHECKING, Type, TypeVar, Dict, Any, Optional, Union
+from typing import TYPE_CHECKING, Type, TypeVar, Any, Optional, Union
 import httpx
 import asyncio
+
 if TYPE_CHECKING:
     from ._client import RelevanceAI, AsyncRelevanceAI
 
@@ -18,8 +19,8 @@ class SyncAPIResource:
         self, 
         path: str, 
         cast_to: Type[ResponseT] = None, 
-        body: Optional[Dict[str, Any]] = None, 
-        params: Optional[Dict[str, Any]] = None
+        body: Optional[dict[str, Any]] = None, 
+        params: Optional[dict[str, Any]] = None
     ) -> ResponseT:
         response = self._client.get(path, json=body, params=params)
         return self._cast_response(response, cast_to)
@@ -28,9 +29,9 @@ class SyncAPIResource:
         self, 
         path: str, 
         cast_to: Type[ResponseT] = None, 
-        body: Optional[Dict[str, Any]] = None, 
-        params: Optional[Dict[str, Any]] = None, 
-        options: Optional[Dict[str, Any]] = None
+        body: Optional[dict[str, Any]] = None, 
+        params: Optional[dict[str, Any]] = None, 
+        options: Optional[dict[str, Any]] = None
     ) -> ResponseT:
         options = options or {}
         response = self._client.post(path, json=body, params=params, **options)
@@ -40,9 +41,9 @@ class SyncAPIResource:
         self, 
         path: str, 
         cast_to: Type[ResponseT] = None, 
-        body: Optional[Dict[str, Any]] = None, 
-        params: Optional[Dict[str, Any]] = None, 
-        options: Optional[Dict[str, Any]] = None
+        body: Optional[dict[str, Any]] = None, 
+        params: Optional[dict[str, Any]] = None, 
+        options: Optional[dict[str, Any]] = None
     ) -> ResponseT:
         options = options or {}
         response = self._client.patch(path, json=body, params=params, **options)
@@ -52,9 +53,9 @@ class SyncAPIResource:
         self, 
         path: str, 
         cast_to: Type[ResponseT] = None, 
-        body: Optional[Dict[str, Any]] = None, 
-        params: Optional[Dict[str, Any]] = None, 
-        options: Optional[Dict[str, Any]] = None
+        body: Optional[dict[str, Any]] = None, 
+        params: Optional[dict[str, Any]] = None, 
+        options: Optional[dict[str, Any]] = None
     ) -> ResponseT:
         options = options or {}
         response = self._client.put(path, json=body, params=params, **options)
@@ -64,9 +65,9 @@ class SyncAPIResource:
         self, 
         path: str, 
         cast_to: Type[ResponseT] = None, 
-        body: Optional[Dict[str, Any]] = None, 
-        params: Optional[Dict[str, Any]] = None, 
-        options: Optional[Dict[str, Any]] = None
+        body: Optional[dict[str, Any]] = None, 
+        params: Optional[dict[str, Any]] = None, 
+        options: Optional[dict[str, Any]] = None
     ) -> ResponseT:
         options = options or {}
         response = self._client.delete(path, json=body, params=params, **options)
@@ -75,11 +76,15 @@ class SyncAPIResource:
     def _cast_response(
         self, 
         response: httpx.Response, 
-        cast_to: Type[ResponseT] = None
+        cast_to: Optional[Type[ResponseT]] = None
     ) -> Union[ResponseT, dict, httpx.Response]:
-        if cast_to:
-            return response.json() if cast_to == dict else cast_to(**response.json())
-        return response
+        if not cast_to:
+            return response
+        if isinstance(response, httpx.Response):
+            response = response.json()
+        if cast_to == dict:
+            return response
+        return cast_to(response)
 
     def _sleep(self, seconds: float) -> None:
         time.sleep(seconds)
@@ -94,8 +99,8 @@ class AsyncAPIResource:
         self, 
         path: str, 
         cast_to: Type[ResponseT] = None, 
-        body: Optional[Dict[str, Any]] = None, 
-        params: Optional[Dict[str, Any]] = None
+        body: Optional[dict[str, Any]] = None, 
+        params: Optional[dict[str, Any]] = None
     ) -> ResponseT:
         response = await self._client.get(path, json=body, params=params)
         return await self._cast_response(response, cast_to)
@@ -104,9 +109,9 @@ class AsyncAPIResource:
         self, 
         path: str, 
         cast_to: Type[ResponseT] = None, 
-        body: Optional[Dict[str, Any]] = None, 
-        params: Optional[Dict[str, Any]] = None, 
-        options: Optional[Dict[str, Any]] = None
+        body: Optional[dict[str, Any]] = None, 
+        params: Optional[dict[str, Any]] = None, 
+        options: Optional[dict[str, Any]] = None
     ) -> ResponseT:
         options = options or {}
         response = await self._client.post(path, json=body, params=params, **options)
@@ -116,9 +121,9 @@ class AsyncAPIResource:
         self, 
         path: str, 
         cast_to: Type[ResponseT] = None, 
-        body: Optional[Dict[str, Any]] = None, 
-        params: Optional[Dict[str, Any]] = None, 
-        options: Optional[Dict[str, Any]] = None
+        body: Optional[dict[str, Any]] = None, 
+        params: Optional[dict[str, Any]] = None, 
+        options: Optional[dict[str, Any]] = None
     ) -> ResponseT:
         options = options or {}
         response = await self._client.patch(path, json=body, params=params, **options)
@@ -128,9 +133,9 @@ class AsyncAPIResource:
         self, 
         path: str, 
         cast_to: Type[ResponseT] = None, 
-        body: Optional[Dict[str, Any]] = None, 
-        params: Optional[Dict[str, Any]] = None, 
-        options: Optional[Dict[str, Any]] = None
+        body: Optional[dict[str, Any]] = None, 
+        params: Optional[dict[str, Any]] = None, 
+        options: Optional[dict[str, Any]] = None
     ) -> ResponseT:
         options = options or {}
         response = await self._client.put(path, json=body, params=params, **options)
@@ -140,9 +145,9 @@ class AsyncAPIResource:
         self, 
         path: str, 
         cast_to: Type[ResponseT] = None, 
-        body: Optional[Dict[str, Any]] = None, 
-        params: Optional[Dict[str, Any]] = None, 
-        options: Optional[Dict[str, Any]] = None
+        body: Optional[dict[str, Any]] = None, 
+        params: Optional[dict[str, Any]] = None, 
+        options: Optional[dict[str, Any]] = None
     ) -> ResponseT:
         options = options or {}
         response = await self._client.delete(path, json=body, params=params, **options)
@@ -151,12 +156,15 @@ class AsyncAPIResource:
     async def _cast_response(
         self, 
         response: httpx.Response, 
-        cast_to: Type[ResponseT] = None
+        cast_to: Optional[Type[ResponseT]] = None
     ) -> Union[ResponseT, dict, httpx.Response]:
-        if cast_to:
-            json_data = await response.json()
-            return json_data if cast_to == dict else cast_to(**json_data)
-        return response
+        if not cast_to:
+            return response
+        if isinstance(response, httpx.Response):
+            response = response.json()
+        if cast_to == dict:
+            return response
+        return cast_to(response)
 
     async def _sleep(self, seconds: float) -> None:
         await asyncio.sleep(seconds)
