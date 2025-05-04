@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from .._client import RelevanceAI, AsyncRelevanceAI
 from .._resource import SyncAPIResource, AsyncAPIResource
-from typing import List
 from ..types.knowledge import KnowledgeSet, KnowledgeRow
 
 class Knowledge(SyncAPIResource):
@@ -11,28 +10,28 @@ class Knowledge(SyncAPIResource):
 
     def list_knowledge(
         self, 
-    ) -> List[KnowledgeSet]:
+    ) -> list[KnowledgeSet]:
         path = "knowledge/sets/list"
         body = {
             "filters": [],
             "sort": [{"update_date":"desc"}]
         }
-        response = self._post(path, body=body)
-        return [KnowledgeSet(**item) for item in response.json().get("results", [])]
+        response = self._post(path, body=body, cast_to=dict)
+        return [KnowledgeSet(**item) for item in response.get("results", [])]
     
     def retrieve_knowledge(
         self, 
         knowledge_set: str, 
         max_results: int = 5
-    ) -> List[KnowledgeRow]:
+    ) -> list[KnowledgeRow]:
         path = "knowledge/list"
         body = {
             "knowledge_set": knowledge_set,
             "page_size": max_results,
             "sort": [{"insert_date_": "asc"}]
         }
-        response = self._post(path, body=body)
-        return [KnowledgeRow(**item) for item in response.json().get("results", [])]
+        response = self._post(path, body=body, cast_to=dict)
+        return [KnowledgeRow(**item) for item in response.get("results", [])]
         
     def delete_knowledge(
         self,
@@ -49,28 +48,28 @@ class AsyncKnowledge(AsyncAPIResource):
 
     async def list_knowledge(
         self, 
-    ) -> List[KnowledgeSet]:
+    ) -> list[KnowledgeSet]:
         path = "knowledge/sets/list"
         body = {
             "filters": [],
             "sort": [{"update_date":"desc"}]
         }
-        response = await self._post(path, body=body)
-        return [KnowledgeSet(**item) for item in response.json().get("results", [])]
+        response = await self._post(path, body=body, cast_to=dict)
+        return [KnowledgeSet(**item) for item in response.get("results", [])]
     
     async def retrieve_knowledge(
         self, 
         knowledge_set: str, 
         max_results: int = 5
-    ) -> List[KnowledgeRow]:
+    ) -> list[KnowledgeRow]:
         path = "knowledge/list"
         body = {
             "knowledge_set": knowledge_set,
             "page_size": max_results,
             "sort": [{"insert_date_": "asc"}]
         }
-        response = await self._post(path, body=body)
-        return [KnowledgeRow(**item) for item in response.json().get("results", [])]
+        response = await self._post(path, body=body, cast_to=dict)
+        return [KnowledgeRow(**item) for item in response.get("results", [])]
         
     async def delete_knowledge(
         self,
