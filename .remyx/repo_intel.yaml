@@ -1,0 +1,16 @@
+schema_version: 1
+fork: salma-remyx/relevanceai
+observed_landing_zones:
+- path: relevanceai/
+  shape_tags:
+  - unclassified
+  confirmed_by:
+  - arxiv: 2607.19297v1
+    mode: Mode 3 (inspired experiment)
+    call_site_specifics: (none)
+    branch: graph-based-agentic-ai-with-langgraph-workflow-pathways-for-
+    timestamp: '2026-07-23T07:53:35Z'
+  last_observed: '2026-07-23T07:53:35Z'
+rejected_shapes: []
+coordination_signals: []
+last_updated: '2026-07-23T07:53:35Z'
