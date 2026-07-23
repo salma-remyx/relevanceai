@@ -150,3 +150,37 @@ client.tasks.delete_task(conversation_id="xxxxxxxx")
 ## Explore More
 
 Explore all the methods available for agents, tasks, tools, and knowledge with the [documentation](https://sdk.relevanceai.com/)
+
+## Stateful Workflow Graphs
+
+For long-running, multi-step agent pipelines — trigger a task, poll until it
+completes, retry on transient failure, pause for human review — model the work
+as an explicit **state graph** instead of an ad-hoc `while ... time.sleep()`
+loop. The `relevanceai.workflows` module provides typed state, conditional
+routing, per-node retries, in-memory checkpoints with interrupt/resume, and an
+execution trace (audit trail).
+
+```python
+import asyncio
+from relevanceai import AsyncRelevanceAI
+from relevanceai.workflows import trigger_poll_workflow
+
+async def main():
+    async with AsyncRelevanceAI() as client:
+        agent = await client.agents.retrieve_agent(agent_id="xxxxxxxx")
+        graph = trigger_poll_workflow(agent, "Summarise this lead: ...")
+        result = await graph.ainvoke({}, config={"thread_id": "run-1"})
+        if not result.interrupted:
+            print(result.state["output"])
+            print([entry.node for entry in result.trace])  # audit trail
+
+asyncio.run(main())
+```
+
+A node can also raise `GraphInterrupt` to pause for human-in-the-loop review; the
+graph checkpoints its state and resumes from the same `thread_id` once you
+re-run it.
+
+*Stateful workflow graphs — adapted from "Graph-Based Agentic AI with LangGraph:
+Workflow Pathways for Long-Running Stateful Business Processes" (a target-native
+re-implementation of its workflow insight, not a LangGraph port).*
