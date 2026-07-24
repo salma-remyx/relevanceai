@@ -11,6 +11,12 @@ observed_landing_zones:
     branch: graph-based-agentic-ai-with-langgraph-workflow-pathways-for-
     timestamp: '2026-07-23T07:53:35Z'
   last_observed: '2026-07-23T07:53:35Z'
-rejected_shapes: []
+rejected_shapes:
+- shape_tag: null
+  reason_code: null
+  reason_summary: ''
+  observed:
+  - arxiv: 2607.15257v1
+    timestamp: '2026-07-24T02:12:29Z'
 coordination_signals: []
-last_updated: '2026-07-23T07:53:35Z'
+last_updated: '2026-07-24T02:12:29Z'
