@@ -11,6 +11,16 @@ observed_landing_zones:
     branch: graph-based-agentic-ai-with-langgraph-workflow-pathways-for-
     timestamp: '2026-07-23T07:53:35Z'
   last_observed: '2026-07-23T07:53:35Z'
+- path: examples/
+  shape_tags:
+  - unclassified
+  confirmed_by:
+  - arxiv: 2607.18816v1
+    mode: ''
+    call_site_specifics: ''
+    branch: agenttrails-towards-trust-and-reuse-for-agentic-tasks
+    timestamp: '2026-07-25T13:35:45Z'
+  last_observed: '2026-07-25T13:35:45Z'
 rejected_shapes:
 - shape_tag: null
   reason_code: null
@@ -21,4 +31,4 @@ rejected_shapes:
   - arxiv: 2604.21816v1
     timestamp: '2026-07-24T20:52:44Z'
 coordination_signals: []
-last_updated: '2026-07-24T20:52:44Z'
+last_updated: '2026-07-25T13:35:45Z'
