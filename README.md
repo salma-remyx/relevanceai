@@ -150,3 +150,32 @@ client.tasks.delete_task(conversation_id="xxxxxxxx")
 ## Explore More
 
 Explore all the methods available for agents, tasks, tools, and knowledge with the [documentation](https://sdk.relevanceai.com/)
+
+## Visualising Task Provenance
+
+Turn a task's chronological steps into a provenance / dataflow graph — tool calls become computational actions, their inputs and outputs become data artifacts, and the dependencies between them become visible edges. Useful for understanding dataflow, debugging failures, and comparing executions across runs. Adapted from *AgentTrails: Towards Trust and Reuse for Agentic Tasks*.
+
+```python
+from relevanceai import RelevanceAI
+from relevanceai.provenance import build_provenance, quotient_graph, recurring_patterns
+
+client = RelevanceAI()
+agent = client.agents.retrieve_agent(agent_id="xxxxxxxx")
+
+task_view = agent.view_task_steps(conversation_id="xxxxxxxx")
+
+# Provenance graph for one task — render as Graphviz DOT.
+graph = build_provenance(task_view, conversation_id="xxxxxxxx")
+print(graph.to_dot())
+
+# Compare several executions: recurring tools/artifacts merge on a shared canvas.
+conversation_ids = ["xxxxxxxx", "yyyyyyyy"]
+graphs = [
+    build_provenance(agent.view_task_steps(conversation_id=cid), conversation_id=cid)
+    for cid in conversation_ids
+]
+joined = quotient_graph(graphs)
+
+# Surface recurring tool-use patterns across the executions.
+print(recurring_patterns(graphs, n=2))
+```
