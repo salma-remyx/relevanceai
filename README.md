@@ -150,3 +150,22 @@ client.tasks.delete_task(conversation_id="xxxxxxxx")
 ## Explore More
 
 Explore all the methods available for agents, tasks, tools, and knowledge with the [documentation](https://sdk.relevanceai.com/)
+
+## Calibrated Tool Retrieval
+
+Large tool libraries share generic descriptive phrasing ("this tool takes ... and returns ...") that inflates ordinary similarity and hides the tokens that actually distinguish one capability from the next. `relevanceai.calibrated_tool_retrieval` ranks the tools returned by `client.tools.list_tools()` with that shared descriptive background calibrated out, so a query for the right capability is not out-scored by descriptions that merely echo the boilerplate.
+
+```python
+from relevanceai import RelevanceAI
+from relevanceai.calibrated_tool_retrieval import SkillLibrary
+
+client = RelevanceAI()
+library = SkillLibrary.from_tools(client.tools.list_tools())
+
+for hit in library.retrieve("translate french text into english", top_k=5):
+    print(hit.rank, hit.score, hit.key)
+```
+
+Each `SkillHit` carries a calibrated `score`, the Semantic Background Calibration `semantic_score`, the Lexical Evidence Calibration `lexical_score`, and a `raw_score` baseline (background kept) for comparison. The retrieval is training-free and runs client-side over the `Tool.metadata.description` strings — no model download or extra dependency.
+
+(Calibrated Tool Retrieval — adapted from *SkillSight: Seeing Through Shared Descriptions for Accurate Skill Retrieval*, arxiv:2607.18785. The shared-background calibration is reproduced at full fidelity; the paper's learned dense encoder is replaced by a parameter-free TF-IDF vector space.)
