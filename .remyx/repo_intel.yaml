@@ -25,7 +25,12 @@ observed_landing_zones:
     call_site_specifics: ''
     branch: skillsight-seeing-through-shared-descriptions-for-accurate-s
     timestamp: '2026-08-03T03:30:07Z'
-  last_observed: '2026-08-03T03:30:07Z'
+  - arxiv: 2607.14707v1
+    mode: ''
+    call_site_specifics: ''
+    branch: harnessing-llms-for-reliable-academic-supervision-a-comparat
+    timestamp: '2026-08-04T11:19:55Z'
+  last_observed: '2026-08-04T11:19:55Z'
 rejected_shapes:
 - shape_tag: null
   reason_code: null
@@ -36,4 +41,4 @@ rejected_shapes:
   - arxiv: 2604.21816v1
     timestamp: '2026-07-24T20:52:44Z'
 coordination_signals: []
-last_updated: '2026-08-03T03:30:07Z'
+last_updated: '2026-08-04T11:19:55Z'
