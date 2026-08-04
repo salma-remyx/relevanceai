@@ -150,3 +150,28 @@ client.tasks.delete_task(conversation_id="xxxxxxxx")
 ## Explore More
 
 Explore all the methods available for agents, tasks, tools, and knowledge with the [documentation](https://sdk.relevanceai.com/)
+
+## Task Harness
+
+Wrap an agent's task execution in deterministic scaffolding — an LLM-as-judge
+loop with bounded retry, a human-in-the-loop confirmation gate, and a per-node
+audit trail — so outputs are reliable and traceable. Adapted from the
+harness-engineering patterns in ["Harnessing LLMs for Reliable Academic
+Supervision"](https://arxiv.org/abs/2607.14707v1).
+
+```python
+from relevanceai import RelevanceAI
+from examples.task_harness import TaskHarness, default_judge
+
+client = RelevanceAI()
+agent = client.agents.retrieve_agent(agent_id="xxxxxxxx")
+
+harness = TaskHarness(agent, judge=default_judge)
+output, trail = harness.run(message="Summarise this account.", max_retries=2)
+print(trail.to_json())  # per-node audit: trigger -> hitl -> judge -> retry
+```
+
+`run_reliability_comparison(agent, scenarios, judge=...)` runs the same scenarios
+with the harness on vs off and reports each mode's pass rate. Pass your own
+`output -> (accepted, reason)` callable as `judge` to plug in a real
+LLM-as-judge; `default_judge` is a parameter-free non-empty check.
