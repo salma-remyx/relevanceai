@@ -150,3 +150,37 @@ client.tasks.delete_task(conversation_id="xxxxxxxx")
 ## Explore More
 
 Explore all the methods available for agents, tasks, tools, and knowledge with the [documentation](https://sdk.relevanceai.com/)
+
+## Monitoring Agent Tasks
+
+Detect mid-episode agent failures from per-step telemetry: looping tool
+calls, cascading tool errors, missing required tool calls, and totals that
+do not reconcile with the tool results actually received. A deterministic
+verification layer adapted from *Real-Time Detection and Repair of LLM
+Agent Failures* (arXiv:2608.02464).
+
+```python
+from relevanceai.utils.agent_failure_monitor import (
+    MonitorConfig,
+    monitor_task_view,
+)
+
+# After a task finishes, inspect its step telemetry
+task_view = agent.view_task_steps(task.conversation_id)
+
+report = monitor_task_view(
+    task_view,
+    config=MonitorConfig(
+        enable_coverage=True,
+        required_tools={"search"},
+        enable_total_verification=True,
+        stated_total=10,
+        total_key="count",
+    ),
+)
+
+print(report.as_dict())
+if report.failed:
+    # recommended repair points at agent.rerun_task(conversation_id)
+    print(report.recommended_repair)
+```
