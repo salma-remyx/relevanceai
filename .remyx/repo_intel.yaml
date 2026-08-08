@@ -43,9 +43,9 @@ observed_landing_zones:
   - arxiv: 2608.02464v1
     mode: ''
     call_site_specifics: ''
-    branch: real-time-detection-and-repair-of-llm-agent-failures-v2
-    timestamp: '2026-08-07T07:46:04Z'
-  last_observed: '2026-08-07T07:46:04Z'
+    branch: real-time-detection-and-repair-of-llm-agent-failures-v3
+    timestamp: '2026-08-08T00:16:16Z'
+  last_observed: '2026-08-08T00:16:16Z'
 rejected_shapes:
 - shape_tag: null
   reason_code: null
@@ -60,4 +60,4 @@ rejected_shapes:
   - arxiv: 2608.02464v1
     timestamp: '2026-08-06T14:01:44Z'
 coordination_signals: []
-last_updated: '2026-08-07T07:46:04Z'
+last_updated: '2026-08-08T00:16:16Z'
