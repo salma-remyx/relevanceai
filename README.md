@@ -150,3 +150,31 @@ client.tasks.delete_task(conversation_id="xxxxxxxx")
 ## Explore More
 
 Explore all the methods available for agents, tasks, tools, and knowledge with the [documentation](https://sdk.relevanceai.com/)
+
+## Verifying agent runs
+
+Agent runs can fail mid-episode -- looping on the same tool call, cascading through errored tools, skipping a required call, or reporting a total the tools never produced. The SDK ships a parameter-free, deterministic trajectory verifier that surfaces these from `view_task_steps` telemetry without a second model call (adapted from [Real-Time Detection and Repair of LLM Agent Failures](https://arxiv.org/abs/2608.02464)).
+
+```python
+import asyncio
+from relevanceai import AsyncRelevanceAI
+from relevanceai.utils.trajectory_verifier import verify_and_repair
+
+async def main():
+    client = AsyncRelevanceAI()
+    agent = await client.agents.retrieve_agent(agent_id="xxxxxxxx")
+    task = await agent.trigger_task(message="Sum the invoice totals.")
+
+    # report.passed is True for a healthy run; otherwise report.codes lists
+    # loop / cascading_tool_errors / agent_error / missing_required_tools /
+    # result_mismatch. A flagged run is re-triggered via agent.rerun_task.
+    report, rerun = await verify_and_repair(
+        agent,
+        task.conversation_id,
+        required_tools=["invoice-search"],  # tools that MUST be called
+        stated_total=412.50,                # total the agent claims in its answer
+    )
+    print(report)
+
+asyncio.run(main())
+```
