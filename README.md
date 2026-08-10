@@ -150,3 +150,25 @@ client.tasks.delete_task(conversation_id="xxxxxxxx")
 ## Explore More
 
 Explore all the methods available for agents, tasks, tools, and knowledge with the [documentation](https://sdk.relevanceai.com/)
+
+## Ranking Tools by Relevance
+
+When an agent is backed by a large tool library, load a small on-demand top-k
+slice instead of putting every tool in context. The SDK ships a dependency-free
+hybrid ranker (lexical BM25 + a parameter-free dense proxy) that scores tools
+against a task query and returns the most relevant ones to load:
+
+```python
+from relevanceai import RelevanceAI
+from relevanceai.utils.tool_ranker import rank_tools
+
+client = RelevanceAI()
+tools = client.tools.list_tools(max_results=100)
+
+# Top 5 tools to load for this task
+for tool in rank_tools("Search a company website for contact emails", tools, top_k=5):
+    print(tool)
+```
+
+Adapted from *Comparative Approaches to Agent Retrieval over Large Skill
+Libraries* (arXiv:2608.06196).
