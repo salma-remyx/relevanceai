@@ -45,7 +45,12 @@ observed_landing_zones:
     call_site_specifics: ''
     branch: real-time-detection-and-repair-of-llm-agent-failures-v3
     timestamp: '2026-08-08T00:16:16Z'
-  last_observed: '2026-08-08T00:16:16Z'
+  - arxiv: 2608.06196v1
+    mode: ''
+    call_site_specifics: ''
+    branch: comparative-approaches-to-agent-retrieval-over-large-skill-l
+    timestamp: '2026-08-10T22:13:42Z'
+  last_observed: '2026-08-10T22:13:42Z'
 rejected_shapes:
 - shape_tag: null
   reason_code: null
@@ -64,4 +69,4 @@ rejected_shapes:
   - arxiv: 2608.06370v1
     timestamp: '2026-08-10T04:30:43Z'
 coordination_signals: []
-last_updated: '2026-08-10T04:30:43Z'
+last_updated: '2026-08-10T22:13:42Z'
