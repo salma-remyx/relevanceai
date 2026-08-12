@@ -33,12 +33,25 @@ for message in message_list:
 
 tool_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 
-# approving the tasks given a list of task_ids above 
-for task_id in task_ids: 
+# approving the tasks given a list of task_ids above
+for task_id in task_ids:
     approved_task = my_agent.approve_task(task_id)
 
     # approve only a specific tool (optional) -> use the code below instead
     approved_task = my_agent.approve_task(task_id, tool_id=tool_id)
+
+
+# --- Audit each task's execution trace (read-only) --------------------------
+# Adapted from A2E (Agent Auditing Engine): now that the tasks have run,
+# walk the task steps returned by Agent.view_task_steps and compute
+# multidimensional metrics (tool use, error recovery, efficiency, planning)
+# over the tools the agent invoked. See relevanceai/utils/task_audit.py.
+from relevanceai.utils.task_audit import audit_task_view
+
+for task_id in task_ids:
+    task_view = my_agent.view_task_steps(task_id)
+    report = audit_task_view(task_view)
+    print("[audit] {}\n{}\n".format(task_id, report.summary()))
 
 
 

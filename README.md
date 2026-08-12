@@ -150,3 +150,21 @@ client.tasks.delete_task(conversation_id="xxxxxxxx")
 ## Explore More
 
 Explore all the methods available for agents, tasks, tools, and knowledge with the [documentation](https://sdk.relevanceai.com/)
+
+## Auditing Task Execution
+
+Once an agent has run a task, walk the task steps returned by `view_task_steps` to compute a multidimensional audit of how the agent behaved — tool use, error recovery, execution efficiency, and task planning — instead of a single pass/fail. This is a read-only utility; it never calls back into the API.
+
+```python
+from relevanceai.utils.task_audit import audit_task_view
+
+task_view = my_agent.view_task_steps(conversation_id=task.conversation_id)
+report = audit_task_view(task_view)
+
+print(report.summary())      # compact per-axis summary
+metrics = report.to_dict()   # nested dict for logging / export
+```
+
+`report.tool_use` (calls, distinct tools, distribution, confirmations), `report.error_recovery` (tool/agent errors, recovered, recovery rate), `report.efficiency` (success rate, planning overhead, duration), and `report.planning` (user/agent messages, tool-call ratio) characterize the run across the four axes.
+
+> Task audit — adapted from A²E: An End-to-End Agent Auditing Engine (https://arxiv.org/abs/2608.07346v1).
