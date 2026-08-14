@@ -57,7 +57,14 @@ observed_landing_zones:
       user code via the README-documented import 'from relevanceai.utils.
     branch: an-end-to-end-agent-auditing-engine
     timestamp: '2026-08-12T12:02:03Z'
-  last_observed: '2026-08-12T12:02:03Z'
+  - arxiv: 2608.04738v1
+    mode: Mode 2 (adapted port)
+    call_site_specifics: examples/approve_tasks_in_bulk.py (pre-existing example entry
+      point, modified to call run_evidence_check -> check_grounding over each approved
+      task); also exported as public library API relevanceai.ut
+    branch: evigraph-evidence-guided-autonomous-research-agents
+    timestamp: '2026-08-14T07:02:59Z'
+  last_observed: '2026-08-14T07:02:59Z'
 rejected_shapes:
 - shape_tag: null
   reason_code: null
@@ -80,4 +87,4 @@ rejected_shapes:
   - arxiv: 2608.07196v1
     timestamp: '2026-08-13T08:12:31Z'
 coordination_signals: []
-last_updated: '2026-08-13T08:12:31Z'
+last_updated: '2026-08-14T07:02:59Z'
