@@ -150,3 +150,20 @@ client.tasks.delete_task(conversation_id="xxxxxxxx")
 ## Explore More
 
 Explore all the methods available for agents, tasks, tools, and knowledge with the [documentation](https://sdk.relevanceai.com/)
+
+### Checking Task Evidence
+
+Verify that an agent's findings are grounded in the data its tools actually
+produced. Each task trace is projected onto a typed evidence graph
+(problem -> evidence -> claim) and any claim not backed by tool output is
+flagged for review (adapted from the EviGraph evidence-guided agent framing).
+
+```python
+from relevanceai.utils.task_evidence import check_grounding, format_report
+
+task_view = my_agent.view_task_steps(conversation_id="xxxxxxxx")
+report = check_grounding(task_view)
+print(format_report(report))
+# task consistent: 2/3 claims grounded
+#   - weak claim [semantic-misalignment] (overlap=0.14): <earliest ungrounded claim ...>
+```
